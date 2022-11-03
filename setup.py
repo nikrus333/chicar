@@ -21,7 +21,8 @@ setup(
     entry_points={
         'console_scripts': [
             'cmd_serial = chicar.cmd_serial:main',
-            'teleop_twist_keyboard = teleop_twist_keyboard:main'
+            'teleop_twist_keyboard = teleop_twist_keyboard:main',
+            'wheel_odom = chicar.wheel_odom:main'
         ],
     },
 )

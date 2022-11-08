@@ -35,7 +35,7 @@ class CarOdom(Node):
         w1 = 2 * pi *  data[0] * 0.229 / 60
         w2 = w1 * n1 / n2
         get_vel = self.radius_whell * w2   # m/sec
-        get_angl =  data[1]
+        get_angl = -1 * data[1]
         angular_velocity = get_vel
     
     def js_cb(self, data):
@@ -45,7 +45,7 @@ class CarOdom(Node):
         if delta/(10**9) >= 0.1:
             current_time = time/(10**9)
             self.timeold = time
-            Vx, Vy, Vtheta = self.calculate_odom(delta/(10**9), [data.velocity[0], data.velocity[1]])
+            Vx, Vy, Vtheta = self.calculate_odom(delta/(10**9), [data.velocity[0],  -1 * data.velocity[1]])
             quaternion = Quaternion()
             quaternion.x = 0.0
             quaternion.y = 0.0
@@ -62,12 +62,9 @@ class CarOdom(Node):
             odom.pose.covariance[35] = 0.1
             odom.pose.pose.orientation = quaternion
             odom.child_frame_id = 'base_link'
-            odom.twist.twist.linear.x = Vx
+            odom.twist.twist.linear.x = 0.0#V0 
             odom.twist.twist.linear.y = 0.0
-            odom.twist.twist.angular.z = Vtheta
-            odom.twist.covariance[0] = 0.01
-            odom.twist.covariance[7] = 0.01
-            odom.twist.covariance[35] = 0.01
+            odom.twist.twist.angular.z = 0.0#Vtheta
             self.odom_pub.publish(odom)
                 
             quaternion.x = 0.0
@@ -86,25 +83,25 @@ class CarOdom(Node):
             transform_stamped_msg.transform.rotation.z = quaternion.z
             transform_stamped_msg.transform.rotation.w = quaternion.w
             
-            q = self.quaternion_from_euler(0.0,0.0,0.0)
-            quaternion.x = q[1]
-            quaternion.y = q[2]
-            quaternion.z = q[3]
-            quaternion.w = q[0]
-            lidar_transform_stamped_msg = TransformStamped()
-            lidar_transform_stamped_msg.header.stamp = now.to_msg()
-            lidar_transform_stamped_msg.header.frame_id = 'base_link'
-            lidar_transform_stamped_msg.child_frame_id = 'scan'
-            lidar_transform_stamped_msg.transform.translation.x = -0.360
-            lidar_transform_stamped_msg.transform.translation.y = 0.0
-            lidar_transform_stamped_msg.transform.translation.z = 0.4
-            lidar_transform_stamped_msg.transform.rotation.x = quaternion.x
-            lidar_transform_stamped_msg.transform.rotation.y = quaternion.y
-            lidar_transform_stamped_msg.transform.rotation.z = quaternion.z
-            lidar_transform_stamped_msg.transform.rotation.w = quaternion.w
+            # q = self.quaternion_from_euler(0.0,0.0,0.0)
+            # quaternion.x = q[1]
+            # quaternion.y = q[2]
+            # quaternion.z = q[3]
+            # quaternion.w = q[0]
+            # lidar_transform_stamped_msg = TransformStamped()
+            # lidar_transform_stamped_msg.header.stamp = now.to_msg()
+            # lidar_transform_stamped_msg.header.frame_id = 'base_link'
+            # lidar_transform_stamped_msg.child_frame_id = 'scan'
+            # lidar_transform_stamped_msg.transform.translation.x = -0.360
+            # lidar_transform_stamped_msg.transform.translation.y = 0.0
+            # lidar_transform_stamped_msg.transform.translation.z = 0.4
+            # lidar_transform_stamped_msg.transform.rotation.x = quaternion.x
+            # lidar_transform_stamped_msg.transform.rotation.y = quaternion.y
+            # lidar_transform_stamped_msg.transform.rotation.z = quaternion.z
+            # lidar_transform_stamped_msg.transform.rotation.w = quaternion.w
             
             self.odom_broadcaster.sendTransform(transform_stamped_msg)
-            self.odom_broadcaster.sendTransform(lidar_transform_stamped_msg)
+            #self.odom_broadcaster.sendTransform(lidar_transform_stamped_msg)
 
     def quaternion_from_euler(self, roll, pitch, yaw):    
         cy = cos(yaw * 0.5)
@@ -131,7 +128,7 @@ class CarOdom(Node):
         self.len_laser = 0.091  #delite
         n1 = 10
         n2 = 24
-        w1 = 2 * pi *  data[0] * 0.229 / 60
+        w1 = data[0]
         w2 = w1 * n1 / n2
         get_vel = self.radius_whell * w2   # m/sec
         get_angl =  data[1]

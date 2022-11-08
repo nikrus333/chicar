@@ -55,7 +55,6 @@ class MinimalSubscriber(Node):
 
     def listener_callback(self, msg):
         data = [msg.linear.x, msg.angular.z]
-        
         self.data_angle = msg.angular.z
         #self.get_logger().info('Publishing: "%s"' % data)
         self.serial_1.write_data(data)
@@ -74,9 +73,9 @@ class MinimalSubscriber(Node):
         #     self.i = -10.0
         # self.i += 1
         msg = Twist()
-        msg.linear.x = 10.0
-        msg.angular.z = 10.0
-        self.test_pub.publish(msg)
+        msg.linear.x = 0.0
+        msg.angular.z = 0.0
+        #self.test_pub.publish(msg)
         
 
 def main(args=None):

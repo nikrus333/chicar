@@ -83,22 +83,22 @@ class CarOdom(Node):
             transform_stamped_msg.transform.rotation.z = quaternion.z
             transform_stamped_msg.transform.rotation.w = quaternion.w
             
-            # q = self.quaternion_from_euler(0.0,0.0,0.0)
-            # quaternion.x = q[1]
-            # quaternion.y = q[2]
-            # quaternion.z = q[3]
-            # quaternion.w = q[0]
-            # lidar_transform_stamped_msg = TransformStamped()
-            # lidar_transform_stamped_msg.header.stamp = now.to_msg()
-            # lidar_transform_stamped_msg.header.frame_id = 'base_link'
-            # lidar_transform_stamped_msg.child_frame_id = 'scan'
-            # lidar_transform_stamped_msg.transform.translation.x = -0.360
-            # lidar_transform_stamped_msg.transform.translation.y = 0.0
-            # lidar_transform_stamped_msg.transform.translation.z = 0.4
-            # lidar_transform_stamped_msg.transform.rotation.x = quaternion.x
-            # lidar_transform_stamped_msg.transform.rotation.y = quaternion.y
-            # lidar_transform_stamped_msg.transform.rotation.z = quaternion.z
-            # lidar_transform_stamped_msg.transform.rotation.w = quaternion.w
+            q = self.quaternion_from_euler(0.0,0.0,0.0)
+            quaternion.x = q[1]
+            quaternion.y = q[2]
+            quaternion.z = q[3]
+            quaternion.w = q[0]
+            lidar_transform_stamped_msg = TransformStamped()
+            lidar_transform_stamped_msg.header.stamp = now.to_msg()
+            lidar_transform_stamped_msg.header.frame_id = 'base_link'
+            lidar_transform_stamped_msg.child_frame_id = 'scan'
+            lidar_transform_stamped_msg.transform.translation.x = 0.05
+            lidar_transform_stamped_msg.transform.translation.y = 0.0
+            lidar_transform_stamped_msg.transform.translation.z = 0.15
+            lidar_transform_stamped_msg.transform.rotation.x = quaternion.x
+            lidar_transform_stamped_msg.transform.rotation.y = quaternion.y
+            lidar_transform_stamped_msg.transform.rotation.z = quaternion.z
+            lidar_transform_stamped_msg.transform.rotation.w = quaternion.w
             
             self.odom_broadcaster.sendTransform(transform_stamped_msg)
             #self.odom_broadcaster.sendTransform(lidar_transform_stamped_msg)

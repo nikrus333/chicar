@@ -32,7 +32,7 @@ class CarOdom(Node):
         self.len_laser = 0.091  #delite
         n1 = 10
         n2 = 24
-        w1 = 2 * pi *  data[0] * 0.229 / 60
+        #w1 = 2 * pi *  data[0] * 0.229 / 60
         w2 = w1 * n1 / n2
         get_vel = self.radius_whell * w2   # m/sec
         get_angl = -1 * data[1]
@@ -56,7 +56,7 @@ class CarOdom(Node):
             odom.header.frame_id = 'odom'
             odom.pose.pose.position.x = self.x
             odom.pose.pose.position.y = self.y
-            odom.pose.pose.position.z = self.theta
+            odom.pose.pose.position.z = 0.0
             odom.pose.covariance[0] = 0.1
             odom.pose.covariance[7] = 0.1
             odom.pose.covariance[35] = 0.1

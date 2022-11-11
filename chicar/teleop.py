@@ -14,7 +14,7 @@ else:
     import tty
 
 MAX_LIN_VEL = 25.0
-MAX_ANG_VEL = 22.0
+MAX_ANG_VEL = 25.0
 LIN_VEL_STEP_SIZE = 1.0
 ANG_VEL_STEP_SIZE = 1.0
 

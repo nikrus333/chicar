@@ -17,9 +17,12 @@ class SerialUSB():
         self.ser.write(data_str_bytea)
     
     def read_data(self):
-        data_str = self.ser.readline().decode('utf-8')
-        print('data_str',data_str) 
-        vel_str, angl_str = data_str.split(',')
+        try:
+            data_str = self.ser.readline().decode('utf-8')
+            print('data_str',data_str) 
+            vel_str, angl_str = data_str.split(',')
+        except:
+            vel_str, angl_str = ['0.00', '0.00']
         return [float(vel_str), float(angl_str)]
 
 class MinimalSubscriber(Node):

@@ -21,9 +21,11 @@ class SerialUSB():
             data_str = self.ser.readline().decode('utf-8')
             print('data_str',data_str) 
             vel_str, angl_str = data_str.split(',')
+            vel_float = [float(vel_str), float(angl_str)]
         except:
             vel_str, angl_str = ['0.00', '0.00']
-        return [float(vel_str), float(angl_str)]
+            vel_float = [float(vel_str), float(angl_str)]
+        return vel_float
 
 class MinimalSubscriber(Node):
     def __init__(self):
@@ -67,7 +69,7 @@ class MinimalSubscriber(Node):
         #chicar have servo privod but dont have enocder(
         self.test_pub_cmd()
         self.msg.velocity[0] = get_vel
-        self.msg.velocity[1] = math.radians(get_angl)
+        self.msg.velocity[1] = get_angl
         self.joints_states_pub.publish(self.msg)
         #self.get_logger().info('Publishing: "%s"' % self.msg)
     

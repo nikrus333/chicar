@@ -1,5 +1,5 @@
 from time import sleep, time
-from math import pi, sin, cos, tan
+from math import pi, sin, cos, tan, sqrt, radians
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import JointState
@@ -7,6 +7,7 @@ from tf2_ros import TransformBroadcaster
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import TransformStamped
 from geometry_msgs.msg import Quaternion
+import json
 
 class CarOdom(Node):
     def __init__(self):
@@ -21,6 +22,7 @@ class CarOdom(Node):
         self.xold = 0
         self.yold = 0
         self.timeold = self.get_clock().now().nanoseconds
+        self.angle_whell = []
 
     def odom_calculate(self):
         self.scale = 1
@@ -94,7 +96,7 @@ class CarOdom(Node):
             lidar_transform_stamped_msg.child_frame_id = 'scan'
             lidar_transform_stamped_msg.transform.translation.x = 0.05
             lidar_transform_stamped_msg.transform.translation.y = 0.0
-            lidar_transform_stamped_msg.transform.translation.z = 0.15
+            lidar_transform_stamped_msg.transform.translation.z = 0.091 
             lidar_transform_stamped_msg.transform.rotation.x = quaternion.x
             lidar_transform_stamped_msg.transform.rotation.y = quaternion.y
             lidar_transform_stamped_msg.transform.rotation.z = quaternion.z
@@ -122,28 +124,76 @@ class CarOdom(Node):
         self.scale = 1
         self.pi = pi
         self.pi = pi
-        self.len_base_car = 0.17   # lenght auto_car
-        self.len_mass_c = 0.08 
+        self.len_base_car = 0.104  # lenght auto_car
+        self.len_mass_c = 0.1
         self.radius_whell = 0.0325 
         self.len_laser = 0.091  #delite
         n1 = 10
         n2 = 24
         w1 = data[0]
         w2 = w1 * n1 / n2
+        
         get_vel = self.radius_whell * w2   # m/sec
+        delta_L = get_vel * delta
         get_angl =  data[1]
-        angular_velocity = get_vel * tan(get_angl) / self.len_base_car 
-        x_delta = get_vel * cos(self.theta)
-        y_delta = get_vel * sin(self.theta)
-        self.theta += delta * angular_velocity
-        self.x += x_delta * delta
-        self.y += y_delta * delta
+        tetta = 0
+        if get_angl != 0:
+            get_angl +=30
+        #print('alfa', alfa)
+            tetta = (self.angle_whell[int(get_angl)][0] - self.angle_whell[int(get_angl)][1]) / 2 
+            tetta = radians(tetta)
+            if tetta > 0:
+                tetta +=0.02
+            else:
+                tetta -=0.02
+        self.get_logger().info('tette ' + str(tetta) + '  get_angle '+ str(get_angl))
+        
+       
+        if tetta !=0:
+            R = sqrt(self.len_mass_c**2 + (1 / tan(tetta))**2 * self.len_base_car**2)
+            delta_theta = delta_L / R
+            if tetta > 0:
+                delta_theta *= -1
+        else:
+            delta_theta = 0
+
+        angular_velocity = get_vel * tan(tetta) / self.len_base_car 
+        
+        x_delta = delta_L * cos(self.theta)
+        y_delta = delta_L * sin(self.theta)
+        self.theta += delta_theta
+        self.x += x_delta 
+        self.y += y_delta 
         Vy = 0
+        #print(len(self.angle_whell))
         return get_vel, Vy, angular_velocity
+
+    def angle_rul(self): #solution angle whell 
+        try:  # loading data on angle values ​​occurs from a file
+            path = '/home/nik/dev_ws/src/chicar/chicar/test.json'
+            with open(path, 'r', encoding='utf-8') as f:
+                data_j = json.load(f)
+                change1 = []
+                change2 = []
+                i = 0
+                for i in range(360):
+                    if i < 30:
+                        print(data_j[i]['%d' % i])
+                        change2.append(data_j[i]['%d' % i])  
+                    if i >= 330 and i < 360:
+                        change1.append(data_j[i]['%d' % i])     
+                    
+                    
+                self.angle_whell = change1 + change2
+                
+        except: 
+            print('it is not possible to open the file')
+
 
 def main():
     rclpy.init()
     odom = CarOdom()
+    odom.angle_rul()
     rclpy.spin(odom)
     rclpy.shutdown()
 

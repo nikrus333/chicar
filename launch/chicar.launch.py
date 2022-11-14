@@ -31,8 +31,9 @@ def generate_launch_description():
         Node(
             package='chicar',
             executable='cmd_serial',
-            output='screen'),
+           ),
         Node(
             package='chicar',
-            executable='wheel_odom'),
+            executable='wheel_odom',
+             output='screen'),
     ])

@@ -3,14 +3,21 @@ from launch_ros.actions import Node
 from launch.actions import DeclareLaunchArgument
 from launch.actions import LogInfo
 from launch.substitutions import LaunchConfiguration
+import os
+import launch_ros
 
 def generate_launch_description():
     port = LaunchConfiguration('port', default='/dev/ttyUSB0')
 
-    frame_id = LaunchConfiguration('frame_id', default='laser')
+    frame_id = LaunchConfiguration('frame_id', default='scan')
+    
+    pkg_share = launch_ros.substitutions.FindPackageShare(package='chicar').find('chicar')
+    default_model_path = os.path.join(pkg_share, 'description/urdf/chicar.urdf')
 
     return LaunchDescription([
-
+        
+        DeclareLaunchArgument(name='model', default_value=default_model_path,
+                                            description='Absolute path to robot urdf file'),
         DeclareLaunchArgument(
             'port',
             default_value=port,
@@ -35,5 +42,9 @@ def generate_launch_description():
         Node(
             package='chicar',
             executable='wheel_odom',
-             output='screen'),
+            ),
+        Node(
+            package='chicar',
+            executable='teleop',
+            output='screen')
     ])

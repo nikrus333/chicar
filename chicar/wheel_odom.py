@@ -14,6 +14,7 @@ class CarOdom(Node):
         super().__init__('car_odom')
         self.odom_pub = self.create_publisher(Odometry, "odom", 100)
         self.odom_broadcaster = TransformBroadcaster(self)
+        self.odom_broadcaster_laser = TransformBroadcaster(self)
         self.sub = self.create_subscription(
             JointState, 'joint_states', self.js_cb, 100)
         self.x = 0
@@ -41,7 +42,7 @@ class CarOdom(Node):
         angular_velocity = get_vel
     
     def js_cb(self, data):
-        now = self.get_clock().now()
+        now =  self.get_clock().now()
         time = now.nanoseconds
         delta = time - self.timeold
         if delta/(10**9) >= 0.1:
@@ -85,7 +86,7 @@ class CarOdom(Node):
             transform_stamped_msg.transform.rotation.z = quaternion.z
             transform_stamped_msg.transform.rotation.w = quaternion.w
             
-            q = self.quaternion_from_euler(0.0,0.0,0.0)
+            q = self.quaternion_from_euler(0.0, 0.0, pi)
             quaternion.x = q[1]
             quaternion.y = q[2]
             quaternion.z = q[3]
@@ -103,7 +104,7 @@ class CarOdom(Node):
             lidar_transform_stamped_msg.transform.rotation.w = quaternion.w
             
             self.odom_broadcaster.sendTransform(transform_stamped_msg)
-            #self.odom_broadcaster.sendTransform(lidar_transform_stamped_msg)
+            self.odom_broadcaster_laser.sendTransform(lidar_transform_stamped_msg)
 
     def quaternion_from_euler(self, roll, pitch, yaw):    
         cy = cos(yaw * 0.5)
@@ -132,7 +133,6 @@ class CarOdom(Node):
         n2 = 24
         w1 = data[0]
         w2 = w1 * n1 / n2
-        
         get_vel = self.radius_whell * w2   # m/sec
         delta_L = get_vel * delta
         get_angl =  data[1]
